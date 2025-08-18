@@ -19,6 +19,17 @@ def file_2_bits(fname):
             byte = f.read(1)
     return bits
 
+
+def bits_2_pixels(bits):
+    pixels = [(0,0,0) if b=='0' else (255,255,255) for b in bits]
+    print("bits_2_pixels: Converted %d bits to %d pixels" % (len(bits),len(pixels)))
+    return pixels 
+
+def pixels_2_bits(pixels):
+    bits = ['0' if p==(0,0,0) else '1' for p in pixels]
+    print("pixels_2_bits: Converted %d pixels to %d bits" % (len(pixels),len(bits)))
+    return bits
+
 def main():
     bits = file_2_bits("data/test.zip")
     bits_2_file(bits, "test-copy.zip")
