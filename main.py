@@ -30,6 +30,24 @@ def pixels_2_bits(pixels):
     print("pixels_2_bits: Converted %d pixels to %d bits" % (len(pixels),len(bits)))
     return bits
 
+
+def pixels_2_png(pixels, fname, res=(512,512)):
+    img = Image.new('RGB', res)
+    img.putdata(pixels[:res[0]*res[1]])
+    img.save(fname)
+    print(f"Saved {fname}")
+
+def png_2_pixels(fname):
+    im = Image.open(fname)
+    pixels = list(im.getdata())
+    print(f"Read {len(pixels)} pixels from {fname}")
+    return pixels
+
 def main():
     bits = file_2_bits("data/test.zip")
-    bits_2_file(bits, "test-copy.zip")
+    pixels = bits_2_pixels(bits)
+    pixels_2_png(pixels, "temp.png", (512,512))
+    recovered = png_2_pixels("temp.png")
+    back_bits = pixels_2_bits(recovered)
+    print("Recovered bits length:", len(back_bits))
+
