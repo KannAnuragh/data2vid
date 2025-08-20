@@ -43,11 +43,25 @@ def png_2_pixels(fname):
     print(f"Read {len(pixels)} pixels from {fname}")
     return pixels
 
+import binascii
+
+def add_header(bits, fname):
+    fname_bits = bin(int(binascii.hexlify(fname.encode()),16))[2:]
+    fname_len = bin(len(fname_bits))[2:].zfill(16)
+    payload_len = bin(len(bits))[2:].zfill(64)
+    return list(fname_len + fname_bits + payload_len) + bits
+
+def decode_header(bits):
+    fname_len = int(''.join(bits[:16]),2)
+    fname_bits = ''.join(bits[16:16+fname_len])
+    fname = binascii.unhexlify('%x' % int(fname_bits,2)).decode()
+    payload_len = int(''.join(bits[16+fname_len:16+fname_len+64]),2)
+    return fname, bits[16+fname_len+64:16+fname_len+64+payload_len]
+
 def main():
-    bits = file_2_bits("data/test.zip")
-    pixels = bits_2_pixels(bits)
-    pixels_2_png(pixels, "temp.png", (512,512))
-    recovered = png_2_pixels("temp.png")
-    back_bits = pixels_2_bits(recovered)
-    print("Recovered bits length:", len(back_bits))
+    orig_bits = file_2_bits("data/test.zip")
+    wrapped = add_header(orig_bits, "test.zip")
+    fname, payload = decode_header(wrapped)
+    print("Decoded fname:", fname)
+    print("Payload bits:", len(payload))
 
